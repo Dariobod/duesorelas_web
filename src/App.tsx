@@ -32,6 +32,19 @@ function Home() {
   return <main>
     <section className="hero"><img src="/assets/hero-due-sorelas.png" alt="Mujer usando bijouterie artesanal Due Sorelas" /><div className="hero-copy"><p className="eyebrow">Bijouterie creada a mano</p><h1>Objetos pequeños,<br /><em>gestos que quedan.</em></h1><Link className="button button-light" to={categoryPath('collares')}>Explorar piezas <span>↗</span></Link></div><p className="hero-note">Hecho con intención<br />en Buenos Aires</p></section>
     <section className="intro section"><p className="eyebrow">Nuestra forma</p><h2>Diseñamos piezas que se sienten propias desde el primer día.</h2><p>Collares, pulseras, dijes y pequeños adornos para combinar, regalar y llevar cerca.</p></section>
+    <section className="about section" id="quienes-somos">
+      <div className="about-heading"><p className="eyebrow">Quiénes somos</p><span>02 — Historia</span></div>
+      <div className="about-layout">
+        <div className="about-mark" aria-hidden="true">DUE<br /><em>Sorelas</em></div>
+        <div className="about-copy">
+          <p className="about-lead">Somos dos hermanas, <em>Myr y Eli</em>, cada una con su profesión y algo en común: nos gusta la moda y pensar detalles originales o especiales a la hora de elegir un obsequio.</p>
+          <p>Con los años, surgió la idea de plasmar esa pasión en el diseño de accesorios. Inicialmente nació como un hobby, para gratificarnos y para agasajar a las personas de nuestro entorno. Luego, nos animamos a dar el paso.</p>
+          <p>Y acá estamos, pensando todos los días en nuevas opciones y diseños. Lo que más nos entusiasma es que puedan participar: elegir colores y sugerir cambios por gusto o necesidad.</p>
+          <p className="about-highlight">Personalizar los diseños es lo más lindo, porque significa hacer escuchando. Ese ida y vuelta es muy placentero.</p>
+          <p className="about-signoff">Somos DUE SORELAS <small>(con licencia gramatical en <em>sorelle</em>)</small><br />Y si leíste hasta acá, muchas gracias. <span aria-label="corazón">♥</span></p>
+        </div>
+      </div>
+    </section>
     <section className="categories section"><div className="section-heading"><p className="eyebrow">Explorá por rubro</p><span>01 — 05</span></div><div className="category-grid">{categories.map((category, index) => <Link className={`category-card category-${index + 1}`} key={category.slug} to={categoryPath(category.slug)}><img src={category.image} alt="" style={{ objectPosition: category.position }} loading="lazy" /><div><span>0{index + 1}</span><h3>{category.name}</h3><p>{category.intro}</p><b>Descubrir <i>↗</i></b></div></Link>)}</div></section>
     <section className="craft-feature section"><div className="craft-copy"><p className="eyebrow">El detalle importa</p><h2>Hecho lento.<br /><em>Para usar mucho.</em></h2><p>Cada composición nace de combinar texturas, color y pequeños símbolos. La imperfección también es parte de la pieza.</p><a className="text-link" href={whatsappUrl('una pieza personalizada')} target="_blank" rel="noreferrer">Hacer una consulta <span>↗</span></a></div><div className="craft-video"><video autoPlay muted loop playsInline poster="/assets/catalogo-due-sorelas.png"><source src="https://videos.pexels.com/video-files/6263745/6263745-sd_360_640_25fps.mp4" type="video/mp4" /></video><small>Video de demostración · reemplazable por Cloudinary</small></div></section>
     <section className="featured section"><div className="section-heading"><p className="eyebrow">Selección</p><Link className="text-link" to={categoryPath('collares')}>Ver todo <span>↗</span></Link></div><div className="product-grid">{featured.map((product) => <ProductCard product={product} key={product.slug} />)}</div></section>

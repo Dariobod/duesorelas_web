@@ -12,3 +12,4 @@ Desarrollo entregado:
 - Dos imágenes de demostración originales generadas para el proyecto y un video de referencia de Pexels, señalizado para reemplazo futuro por Cloudinary.
 - Compilación de producción validada con `npm run build`.
 - Git inicializado y publicado en la rama `main` de `Dariobod/duesorelas_web`.
+- Se incorporó la sección editorial "Quiénes somos", con la historia de Myr y Eli y el foco en la personalización de piezas.
