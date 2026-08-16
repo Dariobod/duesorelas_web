@@ -1,8 +1,36 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import Lenis from 'lenis'
 import { categories, money, products, whatsappUrl, type Product } from './data/catalog'
 
 const categoryPath = (slug: string) => `/categorias/${slug}`
+
+function SmoothScroll() {
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const lenis = new Lenis({
+      duration: 1.05,
+      easing: (time) => 1 - Math.pow(2, -10 * time),
+      smoothWheel: true,
+      syncTouch: false,
+      wheelMultiplier: 0.85,
+    })
+    let frameId = 0
+    const animate = (time: number) => {
+      lenis.raf(time)
+      frameId = requestAnimationFrame(animate)
+    }
+
+    frameId = requestAnimationFrame(animate)
+    return () => {
+      cancelAnimationFrame(frameId)
+      lenis.destroy()
+    }
+  }, [])
+
+  return null
+}
 
 function Header() {
   const [open, setOpen] = useState(false)
@@ -71,4 +99,4 @@ function NotFound() { return <main className="not-found"><p className="eyebrow">
 
 function Footer() { return <footer className="site-footer"><Link className="brand" to="/">DUE <em>Sorelas</em></Link><p>Bijouterie creada a mano.<br />Buenos Aires, Argentina.</p><a href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">WhatsApp ↗</a><small>Demo con recursos visuales generados y video de Pexels. Antes de publicar, reemplazar por imágenes y video propios/Cloudinary.</small></footer> }
 
-export default function App() { return <><Header /><Routes><Route path="/" element={<Home />} /><Route path="/categorias/:slug" element={<CategoryPage />} /><Route path="/productos/:slug" element={<ProductPage />} /><Route path="*" element={<NotFound />} /></Routes><Footer /></> }
+export default function App() { return <><SmoothScroll /><Header /><Routes><Route path="/" element={<Home />} /><Route path="/categorias/:slug" element={<CategoryPage />} /><Route path="/productos/:slug" element={<ProductPage />} /><Route path="*" element={<NotFound />} /></Routes><Footer /></> }
