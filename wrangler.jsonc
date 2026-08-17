@@ -2,6 +2,13 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "duesorelas-web",
   "compatibility_date": "2026-08-17",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "duesorelas-db",
+      "database_id": "62736c94-bfda-4a9f-aa1e-829e22953a14"
+    }
+  ],
   "assets": {
     "directory": "./dist"
   }
