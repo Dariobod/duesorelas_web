@@ -32,5 +32,6 @@ npm run dev
 # Due Sorelas Web
 
 <!-- Prueba de sincronizacion automatica -->
+<!-- Flujo verificado: commit local y despliegue remoto -->
 
 <!-- Verificación del flujo GitHub → Cloudflare Workers -->
