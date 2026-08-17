@@ -14,3 +14,4 @@ Desarrollo entregado:
 - Git inicializado y publicado en la rama `main` de `Dariobod/duesorelas_web`.
 - Se incorporó la sección editorial "Quiénes somos", con la historia de Myr y Eli y el foco en la personalización de piezas.
 - Se añadió desplazamiento global suave con inercia, respetando la preferencia de accesibilidad para reducir movimiento.
+- Se decidió reservar la conexión de `duesorelas.com.ar` para la etapa final, después de validar el sitio en local y en una URL temporal.
