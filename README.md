@@ -29,3 +29,6 @@ npm run dev
 3. Elegir el preset **Vite**.
 4. Definir `npm run build` como comando y `dist` como directorio de salida.
 5. Configurar una regla SPA (`/* → /index.html`) si se publica con rutas directas de React Router.
+# Due Sorelas Web
+
+<!-- Verificación del flujo GitHub → Cloudflare Workers -->
