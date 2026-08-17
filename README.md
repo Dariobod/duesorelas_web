@@ -31,4 +31,6 @@ npm run dev
 5. Configurar una regla SPA (`/* → /index.html`) si se publica con rutas directas de React Router.
 # Due Sorelas Web
 
+<!-- Prueba de sincronizacion automatica -->
+
 <!-- Verificación del flujo GitHub → Cloudflare Workers -->
