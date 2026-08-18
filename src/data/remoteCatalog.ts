@@ -16,7 +16,8 @@ const mapProduct = (item: ApiProduct): Product => {
   const gallery = (item.images || []).map((image) => image.url).filter(Boolean)
   const fallback = fallbackProducts.find((product) => product.slug === item.slug)
   const image = gallery[0] || fallback?.image || '/assets/catalogo-due-sorelas.png'
-  return { slug: item.slug, category: item.category, name: item.title, shortDescription: item.description.slice(0, 120), description: item.description, price: item.priceArs, material: item.materials, dimensions: item.measurements, image, gallery: gallery.length ? gallery : [image] }
+  const categoryAliases: Record<string, string> = { collar: 'collares', pulsera: 'pulseras', dije: 'dijes', colgante: 'colgantes', accesorio: 'accesorios' }
+  return { slug: item.slug, category: categoryAliases[item.category] || item.category, name: item.title, shortDescription: item.description.slice(0, 120), description: item.description, price: item.priceArs, material: item.materials, dimensions: item.measurements, image, gallery: gallery.length ? gallery : [image], featured: fallback?.featured ?? true }
 }
 
 export function useRemoteProducts() {
