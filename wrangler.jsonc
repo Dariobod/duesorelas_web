@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "duesorelas-web",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-08-17",
   "d1_databases": [
     {
@@ -10,6 +11,7 @@
     }
   ],
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS"
   }
 }
