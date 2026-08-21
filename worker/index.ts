@@ -34,6 +34,7 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/api/admin/login' && request.method === 'POST') {
+      if (!env.ADMIN_PASSWORD || !env.SESSION_SECRET) return json({ error: 'Configuración de secretos incompleta' }, { status: 500 });
       const body = await request.json<{ password?: string }>();
       if (!body.password || body.password !== env.ADMIN_PASSWORD) return json({ error: 'Credenciales inválidas' }, { status: 401 });
       const payload = encode(JSON.stringify({ expiresAt: Date.now() + 1000 * 60 * 60 * 8 }));
