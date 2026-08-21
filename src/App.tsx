@@ -37,10 +37,15 @@ function ScrollToTop() {
   const location = useLocation()
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
-    document.documentElement.scrollTop = 0
-    document.body.scrollTop = 0
-  }, [location.pathname])
+    const reset = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+    }
+    reset()
+    const frame = requestAnimationFrame(reset)
+    return () => cancelAnimationFrame(frame)
+  }, [location.pathname, location.key])
 
   return null
 }
