@@ -3,6 +3,7 @@ import { Link, NavLink, Route, Routes, useLocation, useParams } from 'react-rout
 import Lenis from 'lenis'
 import { categories, money, products, whatsappUrl, type Product } from './data/catalog'
 import { useRemoteProducts } from './data/remoteCatalog'
+import Admin from './Admin'
 
 const categoryPath = (slug: string) => `/categorias/${slug}`
 
@@ -120,4 +121,4 @@ function NotFound() { return <main className="not-found"><p className="eyebrow">
 
 function Footer() { return <footer className="site-footer"><Link className="brand" to="/">DUE <em>Sorelas</em></Link><p>Bijouterie creada a mano.<br />Buenos Aires, Argentina.</p><a href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">WhatsApp ↗</a><small>Demo con recursos visuales generados y video de Pexels. Antes de publicar, reemplazar por imágenes y video propios/Cloudinary.</small></footer> }
 
-export default function App() { return <><SmoothScroll /><ScrollToTop /><Header /><Routes><Route path="/" element={<Home />} /><Route path="/categorias/:slug" element={<CategoryPage />} /><Route path="/productos/:slug" element={<ProductPage />} /><Route path="*" element={<NotFound />} /></Routes><Footer /></> }
+export default function App() { return <><SmoothScroll /><ScrollToTop /><Header /><Routes><Route path="/" element={<Home />} /><Route path="/categorias/:slug" element={<CategoryPage />} /><Route path="/productos/:slug" element={<ProductPage />} /><Route path="/admin" element={<Admin />} /><Route path="*" element={<NotFound />} /></Routes><Footer /></> }
