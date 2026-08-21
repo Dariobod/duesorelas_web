@@ -33,6 +33,18 @@ function SmoothScroll() {
   return null
 }
 
+function ScrollToTop() {
+  const location = useLocation()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [location.pathname])
+
+  return null
+}
+
 function Header() {
   const [open, setOpen] = useState(false)
   const location = useLocation()
@@ -103,4 +115,4 @@ function NotFound() { return <main className="not-found"><p className="eyebrow">
 
 function Footer() { return <footer className="site-footer"><Link className="brand" to="/">DUE <em>Sorelas</em></Link><p>Bijouterie creada a mano.<br />Buenos Aires, Argentina.</p><a href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">WhatsApp ↗</a><small>Demo con recursos visuales generados y video de Pexels. Antes de publicar, reemplazar por imágenes y video propios/Cloudinary.</small></footer> }
 
-export default function App() { return <><SmoothScroll /><Header /><Routes><Route path="/" element={<Home />} /><Route path="/categorias/:slug" element={<CategoryPage />} /><Route path="/productos/:slug" element={<ProductPage />} /><Route path="*" element={<NotFound />} /></Routes><Footer /></> }
+export default function App() { return <><SmoothScroll /><ScrollToTop /><Header /><Routes><Route path="/" element={<Home />} /><Route path="/categorias/:slug" element={<CategoryPage />} /><Route path="/productos/:slug" element={<ProductPage />} /><Route path="*" element={<NotFound />} /></Routes><Footer /></> }
