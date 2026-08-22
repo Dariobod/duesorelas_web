@@ -33,6 +33,7 @@ async function readJson<T>(request: Request, maxBytes = 64 * 1024): Promise<T> {
   return JSON.parse(new TextDecoder().decode(bytes)) as T
 }
 
+function validText(value: unknown, max: number) { return typeof value === 'string' && value.length <= max }
 function sameOrigin(request: Request) { const origin = request.headers.get('origin'); return !origin || origin === new URL(request.url).origin }
 
 async function isAdmin(request: Request, env: Env) {
