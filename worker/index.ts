@@ -87,7 +87,8 @@ export default {
         const id = body.id || result.meta.last_row_id;
         const images = [body.image_1, body.image_2].filter(Boolean);
         const imageStatements = images.map((image, index) => env.DB.prepare('INSERT INTO product_images (product_id,object_key,alt_text,sort_order,is_primary) VALUES (?,?,?,?,?)').bind(id, image, body.title, index, index === 0 ? 1 : 0));
-        await env.DB.batch([env.DB.prepare('DELETE FROM product_images WHERE product_id=?').bind(id), ...imageStatements]);
+        await env.DB.prepare('DELETE FROM product_images WHERE product_id=?').bind(id).run();
+        for (const imageStatement of imageStatements) await imageStatement.run();
         return json({ ok: true, id }, { headers: { 'cache-control': 'no-store, private' } });
       }
     }
