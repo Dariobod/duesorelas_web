@@ -28,6 +28,9 @@
 .admin-head button:hover { color: var(--ink); }
 .admin-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .admin-actions .text-link { border: 0; border-bottom: 1px solid; background: transparent; cursor: pointer; padding: 0 0 4px; }
+.icon-button { width: 28px; height: 28px; display: inline-grid; place-items: center; padding: 0; border: 0; border-bottom: 1px solid transparent; background: transparent; cursor: pointer; color: var(--muted); }
+.icon-button:hover { color: var(--ink); border-bottom-color: currentColor; }
+.admin-action-icon { width: 17px; height: 17px; }
 .danger-link { color: #a33b2f; }
 .admin-thumb { width: 82px; height: 82px; margin-top: 5px; border: 1px solid var(--line); object-fit: cover; background: #e8e0d8; }
 .admin-toolbar { gap: 10px; flex-wrap: wrap; }
