@@ -53,9 +53,23 @@ function ScrollToTop() {
 
 function Header() {
   const [open, setOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const location = useLocation()
   useEffect(() => setOpen(false), [location.pathname])
-  return <header className="site-header">
+  useEffect(() => {
+    let lastScroll = window.scrollY
+    const onScroll = () => {
+      const current = window.scrollY
+      if (current <= 24 || current < lastScroll - 4) setHidden(false)
+      else if (current > lastScroll + 4 && current > 90) { setHidden(true); setOpen(false) }
+      lastScroll = current
+    }
+    const onPointerMove = (event: PointerEvent) => { if (event.clientY <= 90) setHidden(false) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('pointermove', onPointerMove, { passive: true })
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('pointermove', onPointerMove) }
+  }, [])
+  return <header className={`site-header${hidden ? ' is-hidden' : ''}`}>
     <button className="menu-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="main-nav"><span /><span /></button>
     <Link className="brand" to="/" aria-label="Due Sorelas, inicio">DUE <em>Sorelas</em></Link>
     <a className="header-contact" href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">Consultar <span>↗</span></a>
