@@ -70,6 +70,7 @@ export default {
         return json(result.results.map((product) => ({ ...product, images: JSON.parse(String(product.images || '[]')) })), { headers: { 'cache-control': 'no-store, private' } });
       }
       if (request.method === 'POST' || request.method === 'PUT') {
+        try {
         if (!sameOrigin(request)) return json({ error: 'Origen no permitido' }, { status: 403 });
         let body: { id?: number; title: string; selection?: boolean; category: string; description?: string; materials?: string; measurements?: string; price_note?: string; price_ars: number; image_1?: string; image_2?: string };
         try { body = await readJson(request); } catch { return json({ error: 'Solicitud inválida' }, { status: 400 }); }
@@ -90,6 +91,10 @@ export default {
         await env.DB.prepare('DELETE FROM product_images WHERE product_id=?').bind(id).run();
         for (const imageStatement of imageStatements) await imageStatement.run();
         return json({ ok: true, id }, { headers: { 'cache-control': 'no-store, private' } });
+        } catch (error) {
+          console.error('admin product save failed', error);
+          return json({ error: 'No se pudo guardar el producto', detail: error instanceof Error ? error.message : String(error) }, { status: 500, headers: { 'cache-control': 'no-store, private' } });
+        }
       }
     }
 
