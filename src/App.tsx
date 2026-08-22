@@ -97,11 +97,8 @@ function Home() {
     const element = introTitleRef.current
     if (!element || !('IntersectionObserver' in window)) return
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        element.classList.add('is-visible')
-        observer.disconnect()
-      }
-    }, { threshold: 0.25 })
+      element.classList.toggle('is-visible', entry.isIntersecting)
+    }, { threshold: 0.18, rootMargin: '-8% 0px -8% 0px' })
     observer.observe(element)
     return () => observer.disconnect()
   }, [])
