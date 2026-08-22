@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import Lenis from 'lenis'
 import { categories, money, products, whatsappUrl, type Product } from './data/catalog'
@@ -92,9 +92,22 @@ function ProductCard({ product }: { product: Product }) {
 function Home() {
   const catalogProducts = useRemoteProducts()
   const featured = catalogProducts.filter((product) => product.featured).slice(0, 6)
+  const introTitleRef = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    const element = introTitleRef.current
+    if (!element || !('IntersectionObserver' in window)) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        element.classList.add('is-visible')
+        observer.disconnect()
+      }
+    }, { threshold: 0.25 })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
   return <main>
     <section className="hero"><img src="/assets/hero-due-sorelas.png" alt="Mujer usando bijouterie artesanal Due Sorelas" /><div className="hero-copy"><p className="eyebrow">Bijouterie creada a mano</p><h1>Objetos pequeños,<br /><em>gestos que quedan.</em></h1><Link className="button button-light" to={categoryPath('collares')}>Explorar piezas <span>↗</span></Link></div><p className="hero-note">Hecho con intención<br />en Buenos Aires</p></section>
-    <section className="intro section"><p className="eyebrow">Nuestra forma</p><h2>Diseñamos piezas que se sienten propias desde el primer día.</h2><p>Collares, pulseras, dijes y pequeños adornos para combinar, regalar y llevar cerca.</p></section>
+    <section className="intro section"><p className="eyebrow">Nuestra forma</p><h2 ref={introTitleRef} className="intro-reveal">Diseñamos piezas que se sienten propias desde el primer día.</h2><p>Collares, pulseras, dijes y pequeños adornos para combinar, regalar y llevar cerca.</p></section>
     <section className="about section" id="quienes-somos">
       <div className="about-heading"><p className="eyebrow">Quiénes somos</p><span>02 — Historia</span></div>
       <div className="about-layout">
