@@ -24,3 +24,12 @@
 .admin-table { overflow-x: auto; border-top: 1px solid var(--line); margin-bottom: 90px; }
 .admin-row { min-width: 680px; display: grid; grid-template-columns: 2fr 1fr 1fr .7fr; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
 .admin-head { font-family: var(--mono); font-size: 10px; text-transform: uppercase; color: var(--muted); }
+.admin-toolbar { gap: 10px; flex-wrap: wrap; }
+.admin-form { display: grid; gap: 18px; margin: 0 0 45px; padding: 24px; border: 1px solid var(--line); background: #fffaf5; }
+.admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.admin-form label { display: grid; gap: 7px; font-family: var(--mono); font-size: 10px; text-transform: uppercase; }
+.admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 11px; border: 1px solid var(--line); background: white; font: inherit; }
+.admin-form textarea { min-height: 100px; resize: vertical; }
+.admin-check { display: flex !important; align-items: center; gap: 8px !important; flex-direction: row; }
+.admin-check input { width: auto; }
+@media (max-width: 740px) { .admin-form-grid { grid-template-columns: 1fr; } }

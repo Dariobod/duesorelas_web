@@ -48,7 +48,29 @@ export default {
 
     if (url.pathname === '/api/admin/products') {
       if (!(await isAdmin(request, env))) return json({ error: 'No autorizado' }, { status: 401 });
-      const result = await env.DB.prepare(`SELECT p.id,p.slug,p.title,p.price_ars,p.active,c.name AS category_name FROM products p JOIN categories c ON c.id=p.category_id ORDER BY p.id`).all();
+      if (request.method === 'GET') {
+        const result = await env.DB.prepare(`SELECT p.id,p.slug,p.title,p.description,p.materials,p.measurements,p.price_ars,p.price_note,p.selection,p.featured,p.active,c.slug AS category_slug,c.name AS category_name,COALESCE((SELECT json_group_array(pi.object_key) FROM product_images pi WHERE pi.product_id=p.id ORDER BY pi.sort_order),'[]') AS images FROM products p JOIN categories c ON c.id=p.category_id ORDER BY p.id`).all();
+        return json(result.results.map((product) => ({ ...product, images: JSON.parse(String(product.images || '[]')) })));
+      }
+      if (request.method === 'POST' || request.method === 'PUT') {
+        const body = await request.json<{ id?: number; title: string; selection?: boolean; category: string; description?: string; materials?: string; measurements?: string; price_note?: string; price_ars: number; image_1?: string; image_2?: string }>();
+        const slug = body.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + (body.id ? `-${body.id}` : '');
+        const category = await env.DB.prepare('SELECT id FROM categories WHERE slug=?').bind(body.category).first<{ id: number }>();
+        if (!category) return json({ error: 'Categoría inválida' }, { status: 400 });
+        const statement = body.id
+          ? env.DB.prepare('UPDATE products SET title=?,slug=?,description=?,category_id=?,selection=?,featured=?,materials=?,measurements=?,price_ars=?,price_note=?,updated_at=datetime(\'now\') WHERE id=?').bind(body.title, slug, body.description || '', category.id, body.selection ? 's' : 'n', body.selection ? 1 : 0, body.materials || '', body.measurements || '', Number(body.price_ars) || 0, body.price_note || '', body.id)
+          : env.DB.prepare('INSERT INTO products (title,slug,description,category_id,selection,featured,materials,measurements,price_ars,price_note) VALUES (?,?,?,?,?,?,?,?,?,?)').bind(body.title, slug, body.description || '', category.id, body.selection ? 's' : 'n', body.selection ? 1 : 0, body.materials || '', body.measurements || '', Number(body.price_ars) || 0, body.price_note || '');
+        const result = await statement.run();
+        const id = body.id || result.meta.last_row_id;
+        await env.DB.prepare('DELETE FROM product_images WHERE product_id=?').bind(id).run();
+        const images = [body.image_1, body.image_2].filter(Boolean);
+        for (let index = 0; index < images.length; index += 1) await env.DB.prepare('INSERT INTO product_images (product_id,object_key,alt_text,sort_order,is_primary) VALUES (?,?,?,?,?)').bind(id, images[index], body.title, index, index === 0 ? 1 : 0).run();
+        return json({ ok: true, id });
+      }
+    }
+
+    if (url.pathname === '/api/admin/categories' && (await isAdmin(request, env))) {
+      const result = await env.DB.prepare('SELECT slug,name FROM categories ORDER BY name').all();
       return json(result.results);
     }
 
