@@ -62,6 +62,7 @@ function Header() {
     <nav id="main-nav" className={open ? 'main-nav is-open' : 'main-nav'} aria-label="Categorías">
       <Link to="/">Inicio</Link>
       {categories.map((category) => <NavLink key={category.slug} to={categoryPath(category.slug)}>{category.name}</NavLink>)}
+      <NavLink className="admin-nav-link" to="/admin">Ingresar</NavLink>
     </nav>
   </header>
 }
