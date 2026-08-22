@@ -73,7 +73,7 @@ export default {
       if (request.method === 'POST' || request.method === 'PUT') {
         try {
         if (!sameOrigin(request)) return json({ error: 'Origen no permitido' }, { status: 403 });
-        let body: { id?: number; title: string; selection?: boolean; category: string; description?: string; materials?: string; measurements?: string; price_note?: string; price_ars: number; image_1?: string; image_2?: string };
+        let body: { id?: number; title: string; selection?: boolean; active?: boolean; category: string; description?: string; materials?: string; measurements?: string; price_note?: string; price_ars: number; image_1?: string; image_2?: string };
         try { body = await readJson(request); } catch { return json({ error: 'Solicitud inválida' }, { status: 400 }); }
         if (!validText(body.title, 160) || !validText(body.category, 80) || !validText(body.description || '', 5000) || !validText(body.materials || '', 500) || !validText(body.measurements || '', 300) || !validText(body.price_note || '', 500)) return json({ error: 'Campos inválidos' }, { status: 400 });
         if (!Number.isInteger(Number(body.price_ars)) || Number(body.price_ars) < 0 || Number(body.price_ars) > 100000000) return json({ error: 'Precio inválido' }, { status: 400 });
@@ -83,7 +83,7 @@ export default {
         const category = await env.DB.prepare('SELECT id FROM categories WHERE slug=?').bind(body.category).first<{ id: number }>();
         if (!category) return json({ error: 'Categoría inválida' }, { status: 400 });
         const statement = body.id
-          ? env.DB.prepare('UPDATE products SET title=?,slug=?,description=?,category_id=?,selection=?,featured=?,materials=?,measurements=?,price_ars=?,price_note=?,updated_at=datetime(\'now\') WHERE id=?').bind(body.title, slug, body.description || '', category.id, body.selection ? 's' : 'n', body.selection ? 1 : 0, body.materials || '', body.measurements || '', Number(body.price_ars) || 0, body.price_note || '', body.id)
+          ? env.DB.prepare('UPDATE products SET title=?,slug=?,description=?,category_id=?,selection=?,featured=?,active=?,materials=?,measurements=?,price_ars=?,price_note=?,updated_at=datetime(\'now\') WHERE id=?').bind(body.title, slug, body.description || '', category.id, body.selection ? 's' : 'n', body.selection ? 1 : 0, body.active === false ? 0 : 1, body.materials || '', body.measurements || '', Number(body.price_ars) || 0, body.price_note || '', body.id)
           : env.DB.prepare('INSERT INTO products (title,slug,description,category_id,selection,featured,materials,measurements,price_ars,price_note) VALUES (?,?,?,?,?,?,?,?,?,?)').bind(body.title, slug, body.description || '', category.id, body.selection ? 's' : 'n', body.selection ? 1 : 0, body.materials || '', body.measurements || '', Number(body.price_ars) || 0, body.price_note || '');
         const result = await statement.run();
         const id = body.id || result.meta.last_row_id;
@@ -96,6 +96,15 @@ export default {
           console.error('admin product save failed', error);
           return json({ error: 'No se pudo guardar el producto', detail: error instanceof Error ? error.message : String(error) }, { status: 500, headers: { 'cache-control': 'no-store, private' } });
         }
+      }
+    }
+
+    if (url.pathname.startsWith('/api/admin/products/') && (await isAdmin(request, env))) {
+      const id = Number(url.pathname.split('/').pop());
+      if (!Number.isInteger(id) || id <= 0) return json({ error: 'Producto inválido' }, { status: 400 });
+      if (request.method === 'DELETE') {
+        await env.DB.prepare('DELETE FROM products WHERE id=?').bind(id).run();
+        return json({ ok: true }, { headers: { 'cache-control': 'no-store, private' } });
       }
     }
 
