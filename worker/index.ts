@@ -123,7 +123,7 @@ export default {
     if (url.pathname === '/api/products') {
       const result = await env.DB.prepare(`
         SELECT p.id, p.slug, p.title, p.description, p.materials,
-          p.measurements, p.price_ars, p.price_note, p.active,
+          p.measurements, p.price_ars, p.price_note, p.featured, p.active,
           c.slug AS category_slug, c.name AS category_name,
           COALESCE((
             SELECT json_group_array(json_object(

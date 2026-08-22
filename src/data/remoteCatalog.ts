@@ -8,6 +8,7 @@ type ApiProduct = {
   materials: string
   measurements: string
   priceArs: number
+  featured?: number | boolean
   category: string
   images?: Array<{ url: string }>
 }
@@ -17,7 +18,7 @@ const mapProduct = (item: ApiProduct): Product => {
   const fallback = fallbackProducts.find((product) => product.slug === item.slug)
   const image = gallery[0] || fallback?.image || '/assets/catalogo-due-sorelas.png'
   const categoryAliases: Record<string, string> = { collar: 'collares', pulsera: 'pulseras', dije: 'dijes', colgante: 'colgantes', accesorio: 'accesorios' }
-  return { slug: item.slug, category: categoryAliases[item.category] || item.category, name: item.title, shortDescription: item.description.slice(0, 120), description: item.description, price: item.priceArs, material: item.materials, dimensions: item.measurements, image, gallery: gallery.length ? gallery : [image], featured: fallback?.featured ?? true }
+  return { slug: item.slug, category: categoryAliases[item.category] || item.category, name: item.title, shortDescription: item.description.slice(0, 120), description: item.description, price: item.priceArs, material: item.materials, dimensions: item.measurements, image, gallery: gallery.length ? gallery : [image], featured: item.featured === true || item.featured === 1 }
 }
 
 export function useRemoteProducts() {
