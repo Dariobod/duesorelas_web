@@ -13,8 +13,8 @@ function SmoothScroll() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const lenis = new Lenis({
-      duration: 1.05,
-      easing: (time) => 1 - Math.pow(2, -10 * time),
+      duration: 1.65,
+      easing: (time) => 1 - Math.pow(2, -7 * time),
       smoothWheel: true,
       syncTouch: false,
       wheelMultiplier: 0.85,
