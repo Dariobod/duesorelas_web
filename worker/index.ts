@@ -56,8 +56,13 @@ export default {
       try { body = await readJson(request, 16 * 1024); } catch { return json({ error: 'Solicitud inválida' }, { status: 400 }); }
       if (!body.password || body.password !== env.ADMIN_PASSWORD) return json({ error: 'Credenciales inválidas' }, { status: 401 });
       const payload = encode(JSON.stringify({ expiresAt: Date.now() + 1000 * 60 * 60 * 8 }));
-      const signature = await sign(payload, env.SESSION_SECRET);
-      return json({ ok: true }, { headers: { 'cache-control': 'no-store', 'set-cookie': `__Host-ds_admin=${payload}.${signature}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800` } });
+      try {
+        const signature = await sign(payload, env.SESSION_SECRET);
+        return json({ ok: true }, { headers: { 'cache-control': 'no-store', 'set-cookie': `__Host-ds_admin=${payload}.${signature}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800` } });
+      } catch (error) {
+        console.error('admin login signing failed', error);
+        return json({ error: 'No se pudo iniciar sesión' }, { status: 500, headers: { 'cache-control': 'no-store, private' } });
+      }
     }
 
     if (url.pathname === '/api/admin/logout' && request.method === 'POST') {
@@ -110,8 +115,13 @@ export default {
 
     if (url.pathname === '/api/admin/categories' && (await isAdmin(request, env))) {
       if (request.method === 'GET') {
-        const result = await env.DB.prepare('SELECT id,slug,name,image_url FROM categories ORDER BY name').all();
-        return json(result.results, { headers: { 'cache-control': 'no-store, private' } });
+        try {
+          const result = await env.DB.prepare('SELECT id,slug,name,image_url FROM categories ORDER BY name').all();
+          return json(result.results, { headers: { 'cache-control': 'no-store, private' } });
+        } catch {
+          const result = await env.DB.prepare('SELECT id,slug,name FROM categories ORDER BY name').all();
+          return json(result.results.map((category) => ({ ...category, image_url: '' })), { headers: { 'cache-control': 'no-store, private' } });
+        }
       }
       if (request.method === 'POST' || request.method === 'PUT') {
         if (!sameOrigin(request)) return json({ error: 'Origen no permitido' }, { status: 403 });
@@ -149,10 +159,13 @@ export default {
     }
 
     if (url.pathname === '/api/categories') {
-      const result = await env.DB.prepare(
-        'SELECT id, slug, name, image_url FROM categories ORDER BY name',
-      ).all();
-      return json(result.results);
+      try {
+        const result = await env.DB.prepare('SELECT id, slug, name, image_url FROM categories ORDER BY name').all();
+        return json(result.results);
+      } catch {
+        const result = await env.DB.prepare('SELECT id, slug, name FROM categories ORDER BY name').all();
+        return json(result.results.map((category) => ({ ...category, image_url: '' })));
+      }
     }
 
     if (url.pathname === '/api/products') {
