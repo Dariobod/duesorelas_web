@@ -14,8 +14,9 @@ export function useRemoteCategories() {
     return () => { active = false }
   }, [])
   if (!remote) return fallbackCategories
+  const aliases: Record<string, string> = { collares: 'collar', dijes: 'dije', colgantes: 'colgante', pulseras: 'pulsera', accesorios: 'accesorio' }
   return fallbackCategories.map((category: Category) => {
-    const current = remote.find((item) => item.slug === category.slug)
+    const current = remote.find((item) => item.slug === category.slug || item.slug === aliases[category.slug])
     return current?.image_url ? { ...category, image: current.image_url } : category
   })
 }
