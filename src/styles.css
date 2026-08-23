@@ -34,6 +34,18 @@
 .danger-link { color: #a33b2f; }
 .admin-thumb { width: 82px; height: 82px; margin-top: 5px; border: 1px solid var(--line); object-fit: cover; background: #e8e0d8; }
 .admin-toolbar { gap: 10px; flex-wrap: wrap; }
+.admin-tabs { display: flex; gap: 24px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
+.admin-tabs button { padding: 0 0 12px; border: 0; border-bottom: 1px solid transparent; background: transparent; cursor: pointer; font-family: var(--mono); font-size: 10px; text-transform: uppercase; }
+.admin-tabs button.active { border-bottom-color: var(--ink); color: var(--ink); }
+.admin-error { margin: 0 0 18px; color: #a33b2f; font-size: 13px; }
+.admin-category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 90px; }
+.admin-category-card { border: 1px solid var(--line); background: #fffaf5; }
+.admin-category-card > img, .admin-category-placeholder { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #e8e0d8; }
+.admin-category-placeholder { display: grid; place-items: center; color: var(--muted); font-family: var(--mono); font-size: 10px; text-transform: uppercase; }
+.admin-category-card > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; }
+.admin-category-card h3 { margin: 0 0 4px; font-size: 16px; font-weight: 500; }
+.admin-category-card p { margin: 0; color: var(--muted); font-family: var(--mono); font-size: 10px; }
+.admin-category-thumb { width: 120px; height: 90px; margin-top: 5px; border: 1px solid var(--line); object-fit: cover; }
 .admin-form { display: grid; gap: 18px; margin: 0 0 45px; padding: 24px; border: 1px solid var(--line); background: #fffaf5; }
 .admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .admin-form label { display: grid; gap: 7px; font-family: var(--mono); font-size: 10px; text-transform: uppercase; }
@@ -41,6 +53,6 @@
 .admin-form textarea { min-height: 100px; resize: vertical; }
 .admin-check { display: flex !important; align-items: center; gap: 8px !important; flex-direction: row; }
 .admin-check input { width: auto; }
-@media (max-width: 740px) { .admin-form-grid { grid-template-columns: 1fr; } }
+@media (max-width: 740px) { .admin-form-grid { grid-template-columns: 1fr; } .admin-category-grid { grid-template-columns: 1fr 1fr; } }
 .featured .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 740px) { .featured .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

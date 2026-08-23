@@ -109,13 +109,48 @@ export default {
     }
 
     if (url.pathname === '/api/admin/categories' && (await isAdmin(request, env))) {
-      const result = await env.DB.prepare('SELECT slug,name FROM categories ORDER BY name').all();
-      return json(result.results, { headers: { 'cache-control': 'no-store, private' } });
+      if (request.method === 'GET') {
+        const result = await env.DB.prepare('SELECT id,slug,name,image_url FROM categories ORDER BY name').all();
+        return json(result.results, { headers: { 'cache-control': 'no-store, private' } });
+      }
+      if (request.method === 'POST' || request.method === 'PUT') {
+        if (!sameOrigin(request)) return json({ error: 'Origen no permitido' }, { status: 403 });
+        let body: { id?: number; slug: string; name: string; image_url?: string };
+        try { body = await readJson(request); } catch { return json({ error: 'Solicitud inválida' }, { status: 400 }); }
+        const slug = String(body.slug || '').trim().toLowerCase();
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !validText(body.name, 100) || !body.name.trim()) return json({ error: 'Categoría inválida' }, { status: 400 });
+        const imageUrl = String(body.image_url || '').trim();
+        if (!validText(imageUrl, 1000) || (imageUrl && !imageUrl.startsWith('https://res.cloudinary.com/'))) return json({ error: 'Imagen inválida' }, { status: 400 });
+        try {
+          if (request.method === 'PUT') {
+            if (!Number.isInteger(Number(body.id)) || Number(body.id) <= 0) return json({ error: 'Categoría inválida' }, { status: 400 });
+            await env.DB.prepare('UPDATE categories SET slug=?,name=?,image_url=? WHERE id=?').bind(slug, body.name.trim(), imageUrl, Number(body.id)).run();
+            return json({ ok: true, id: Number(body.id) }, { headers: { 'cache-control': 'no-store, private' } });
+          }
+          const result = await env.DB.prepare('INSERT INTO categories (slug,name,image_url) VALUES (?,?,?)').bind(slug, body.name.trim(), imageUrl).run();
+          return json({ ok: true, id: result.meta.last_row_id }, { status: 201, headers: { 'cache-control': 'no-store, private' } });
+        } catch (error) {
+          const detail = error instanceof Error ? error.message : String(error);
+          return json({ error: 'No se pudo guardar la categoría', detail }, { status: 409 });
+        }
+      }
+    }
+
+    if (url.pathname.startsWith('/api/admin/categories/') && (await isAdmin(request, env))) {
+      if (request.method === 'DELETE') {
+        if (!sameOrigin(request)) return json({ error: 'Origen no permitido' }, { status: 403 });
+        const id = Number(url.pathname.split('/').pop());
+        if (!Number.isInteger(id) || id <= 0) return json({ error: 'Categoría inválida' }, { status: 400 });
+        const products = await env.DB.prepare('SELECT COUNT(*) AS count FROM products WHERE category_id=?').bind(id).first<{ count: number }>();
+        if (Number(products?.count || 0) > 0) return json({ error: 'No se puede borrar una categoría con productos' }, { status: 409 });
+        await env.DB.prepare('DELETE FROM categories WHERE id=?').bind(id).run();
+        return json({ ok: true }, { headers: { 'cache-control': 'no-store, private' } });
+      }
     }
 
     if (url.pathname === '/api/categories') {
       const result = await env.DB.prepare(
-        'SELECT id, slug, name FROM categories ORDER BY name',
+        'SELECT id, slug, name, image_url FROM categories ORDER BY name',
       ).all();
       return json(result.results);
     }

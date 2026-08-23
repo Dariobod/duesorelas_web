@@ -3,6 +3,7 @@ import { Link, NavLink, Route, Routes, useLocation, useParams } from 'react-rout
 import Lenis from 'lenis'
 import { categories, money, products, whatsappUrl, type Product } from './data/catalog'
 import { useRemoteProducts } from './data/remoteCatalog'
+import { useRemoteCategories } from './data/remoteCategories'
 import Admin from './Admin'
 
 const categoryPath = (slug: string) => `/categorias/${slug}`
@@ -91,6 +92,7 @@ function ProductCard({ product }: { product: Product }) {
 
 function Home() {
   const catalogProducts = useRemoteProducts()
+  const homeCategories = useRemoteCategories()
   const featured = catalogProducts.filter((product) => product.featured).slice(0, 6)
   const introTitleRef = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
@@ -118,7 +120,7 @@ function Home() {
         </div>
       </div>
     </section>
-    <section className="categories section"><div className="section-heading"><p className="eyebrow">Explorá por rubro</p><span>01 — 05</span></div><div className="category-grid">{categories.map((category, index) => <Link className={`category-card category-${index + 1}`} key={category.slug} to={categoryPath(category.slug)}><img src={category.image} alt="" style={{ objectPosition: category.position }} loading="lazy" /><div><span>0{index + 1}</span><h3>{category.name}</h3><p>{category.intro}</p><b>Descubrir <i>↗</i></b></div></Link>)}</div></section>
+    <section className="categories section"><div className="section-heading"><p className="eyebrow">Explorá por rubro</p><span>01 — 05</span></div><div className="category-grid">{homeCategories.map((category, index) => <Link className={`category-card category-${index + 1}`} key={category.slug} to={categoryPath(category.slug)}><img src={category.image} alt="" style={{ objectPosition: category.position }} loading="lazy" /><div><span>0{index + 1}</span><h3>{category.name}</h3><p>{category.intro}</p><b>Descubrir <i>↗</i></b></div></Link>)}</div></section>
     <section className="craft-feature section"><div className="craft-copy"><p className="eyebrow">El detalle importa</p><h2>Hecho lento.<br /><em>Para usar mucho.</em></h2><p>Cada composición nace de combinar texturas, color y pequeños símbolos. La imperfección también es parte de la pieza.</p><a className="text-link" href={whatsappUrl('una pieza personalizada')} target="_blank" rel="noreferrer">Hacer una consulta <span>↗</span></a></div><div className="craft-video"><video autoPlay muted loop playsInline poster="/assets/catalogo-due-sorelas.png"><source src="https://videos.pexels.com/video-files/6263745/6263745-sd_360_640_25fps.mp4" type="video/mp4" /></video><small>Video de demostración · reemplazable por Cloudinary</small></div></section>
     <section className="featured section"><div className="section-heading"><p className="eyebrow">Selección</p><Link className="text-link" to={categoryPath('collares')}>Ver todo <span>↗</span></Link></div><div className="product-grid">{featured.map((product) => <ProductCard product={product} key={product.slug} />)}</div></section>
   </main>
