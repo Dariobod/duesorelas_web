@@ -36,6 +36,19 @@ async function readJson<T>(request: Request, maxBytes = 64 * 1024): Promise<T> {
 function validText(value: unknown, max: number) { return typeof value === 'string' && value.length <= max }
 function sameOrigin(request: Request) { const origin = request.headers.get('origin'); return !origin || origin === new URL(request.url).origin }
 const defaultContent = { hero_image: '/assets/hero-due-sorelas.png', craft_video: 'https://videos.pexels.com/video-files/6263745/6263745-sd_360_640_25fps.mp4' }
+const categoryIntroDefaults: Record<string, string> = {
+  collar: 'Capas, amuletos y detalles que acompañan todos los días.', collares: 'Capas, amuletos y detalles que acompañan todos los días.',
+  dije: 'Pequeños símbolos para hacer tuyo cada gesto.', dijes: 'Pequeños símbolos para hacer tuyo cada gesto.',
+  colgante: 'Piezas livianas para llevar cerca.', colgantes: 'Piezas livianas para llevar cerca.',
+  pulsera: 'Texturas, perlas y color para sumar movimiento.', pulseras: 'Texturas, perlas y color para sumar movimiento.',
+  accesorio: 'Objetos pequeños, hechos para regalar o guardar.', accesorios: 'Objetos pequeños, hechos para regalar o guardar.',
+}
+
+async function ensureCategoryIntroColumn(db: D1Database) {
+  const columns = await db.prepare('PRAGMA table_info(categories)').all();
+  if (!columns.results.some((column) => String(column.name) === 'intro')) await db.prepare("ALTER TABLE categories ADD COLUMN intro TEXT NOT NULL DEFAULT ''").run();
+  await db.batch(Object.entries(categoryIntroDefaults).map(([slug, intro]) => db.prepare("UPDATE categories SET intro=? WHERE slug=? AND intro='' ").bind(intro, slug)));
+}
 
 async function isAdmin(request: Request, env: Env) {
   const raw = request.headers.get('Cookie')?.match(/(?:^|; )__Host-ds_admin=([^;]+)/)?.[1]
@@ -147,28 +160,31 @@ export default {
     if (url.pathname === '/api/admin/categories' && (await isAdmin(request, env))) {
       if (request.method === 'GET') {
         try {
-          const result = await env.DB.prepare('SELECT id,slug,name,image_url FROM categories ORDER BY name').all();
+          await ensureCategoryIntroColumn(env.DB);
+          const result = await env.DB.prepare('SELECT id,slug,name,image_url,intro FROM categories ORDER BY name').all();
           return json(result.results, { headers: { 'cache-control': 'no-store, private' } });
         } catch {
           const result = await env.DB.prepare('SELECT id,slug,name FROM categories ORDER BY name').all();
-          return json(result.results.map((category) => ({ ...category, image_url: '' })), { headers: { 'cache-control': 'no-store, private' } });
+          return json(result.results.map((category) => ({ ...category, image_url: '', intro: '' })), { headers: { 'cache-control': 'no-store, private' } });
         }
       }
       if (request.method === 'POST' || request.method === 'PUT') {
         if (!sameOrigin(request)) return json({ error: 'Origen no permitido' }, { status: 403 });
-        let body: { id?: number; slug: string; name: string; image_url?: string };
+        let body: { id?: number; slug: string; name: string; image_url?: string; intro?: string };
         try { body = await readJson(request); } catch { return json({ error: 'Solicitud inválida' }, { status: 400 }); }
         const slug = String(body.slug || '').trim().toLowerCase();
         if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !validText(body.name, 100) || !body.name.trim()) return json({ error: 'Categoría inválida' }, { status: 400 });
         const imageUrl = String(body.image_url || '').trim();
-        if (!validText(imageUrl, 1000) || (imageUrl && !imageUrl.startsWith('https://res.cloudinary.com/'))) return json({ error: 'Imagen inválida' }, { status: 400 });
+        const intro = String(body.intro || '').trim();
+        if (!validText(intro, 500) || !validText(imageUrl, 1000) || (imageUrl && !imageUrl.startsWith('https://res.cloudinary.com/'))) return json({ error: 'Imagen inválida' }, { status: 400 });
         try {
+          await ensureCategoryIntroColumn(env.DB);
           if (request.method === 'PUT') {
             if (!Number.isInteger(Number(body.id)) || Number(body.id) <= 0) return json({ error: 'Categoría inválida' }, { status: 400 });
-            await env.DB.prepare('UPDATE categories SET slug=?,name=?,image_url=? WHERE id=?').bind(slug, body.name.trim(), imageUrl, Number(body.id)).run();
+            await env.DB.prepare('UPDATE categories SET slug=?,name=?,image_url=?,intro=? WHERE id=?').bind(slug, body.name.trim(), imageUrl, intro, Number(body.id)).run();
             return json({ ok: true, id: Number(body.id) }, { headers: { 'cache-control': 'no-store, private' } });
           }
-          const result = await env.DB.prepare('INSERT INTO categories (slug,name,image_url) VALUES (?,?,?)').bind(slug, body.name.trim(), imageUrl).run();
+          const result = await env.DB.prepare('INSERT INTO categories (slug,name,image_url,intro) VALUES (?,?,?,?)').bind(slug, body.name.trim(), imageUrl, intro).run();
           return json({ ok: true, id: result.meta.last_row_id }, { status: 201, headers: { 'cache-control': 'no-store, private' } });
         } catch (error) {
           const detail = error instanceof Error ? error.message : String(error);
@@ -191,11 +207,12 @@ export default {
 
     if (url.pathname === '/api/categories') {
       try {
-        const result = await env.DB.prepare('SELECT id, slug, name, image_url FROM categories ORDER BY name').all();
+        await ensureCategoryIntroColumn(env.DB);
+        const result = await env.DB.prepare('SELECT id, slug, name, image_url, intro FROM categories ORDER BY name').all();
         return json(result.results);
       } catch {
         const result = await env.DB.prepare('SELECT id, slug, name FROM categories ORDER BY name').all();
-        return json(result.results.map((category) => ({ ...category, image_url: '' })));
+        return json(result.results.map((category) => ({ ...category, image_url: '', intro: '' })));
       }
     }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { categories as fallbackCategories, type Category } from './catalog'
 
-type ApiCategory = { slug: string; name: string; image_url?: string }
+type ApiCategory = { slug: string; name: string; image_url?: string; intro?: string }
 
 export function useRemoteCategories() {
   const [remote, setRemote] = useState<ApiCategory[] | null>(null)
@@ -20,7 +20,7 @@ export function useRemoteCategories() {
     return {
       slug: fallback?.slug || item.slug,
       name: item.name || fallback?.name || item.slug,
-      intro: fallback?.intro || 'Piezas pensadas para acompañar tus días.',
+      intro: item.intro || fallback?.intro || 'Piezas pensadas para acompañar tus días.',
       image: item.image_url || fallback?.image || '/assets/catalogo-due-sorelas.png',
       position: fallback?.position,
     } as Category
