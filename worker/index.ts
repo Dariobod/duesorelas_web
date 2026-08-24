@@ -88,6 +88,7 @@ export default {
         const craftVideo = String(body.craft_video || '').trim();
         if (!validText(heroImage, 2000) || !validText(craftVideo, 2000) || (heroImage && heroImage !== defaultContent.hero_image && !heroImage.startsWith('https://')) || (craftVideo && !craftVideo.startsWith('https://'))) return json({ error: 'Las URLs deben ser HTTPS y tener un máximo de 2000 caracteres' }, { status: 400 });
         try {
+          await env.DB.prepare("CREATE TABLE IF NOT EXISTS site_settings (setting_key TEXT PRIMARY KEY, setting_value TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
           await env.DB.batch([
             env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value, updated_at=excluded.updated_at").bind('home_hero_image', heroImage || defaultContent.hero_image),
             env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value, updated_at=excluded.updated_at").bind('home_craft_video', craftVideo || defaultContent.craft_video),
