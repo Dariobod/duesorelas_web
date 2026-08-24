@@ -56,6 +56,7 @@ function Header() {
   const [open, setOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   const location = useLocation()
+  const menuCategories = useRemoteCategories()
   useEffect(() => setOpen(false), [location.pathname])
   useEffect(() => {
     let lastScroll = window.scrollY
@@ -76,7 +77,7 @@ function Header() {
     <a className="header-contact" href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">Consultar <span>↗</span></a>
     <nav id="main-nav" className={open ? 'main-nav is-open' : 'main-nav'} aria-label="Categorías">
       <Link to="/">Inicio</Link>
-      {categories.map((category) => <NavLink key={category.slug} to={categoryPath(category.slug)}>{category.name}</NavLink>)}
+      {menuCategories.map((category) => <NavLink key={category.slug} to={categoryPath(category.slug)}>{category.name}</NavLink>)}
       <NavLink className="admin-nav-link" to="/admin">Ingresar</NavLink>
     </nav>
   </header>
@@ -129,10 +130,11 @@ function Home() {
 function CategoryPage() {
   const { slug } = useParams()
   const catalogProducts = useRemoteProducts()
-  const category = categories.find((item) => item.slug === slug)
+  const catalogCategories = useRemoteCategories()
+  const category = catalogCategories.find((item) => item.slug === slug)
   const categoryProducts = catalogProducts.filter((product) => product.category === slug)
   if (!category) return <NotFound />
-  return <main className="catalog-page"><section className="catalog-heading"><p className="eyebrow">Due Sorelas / {category.name}</p><h1>{category.name}</h1><p>{category.intro}</p></section><nav className="category-pills" aria-label="Filtrar por categoría">{categories.map((item) => <Link className={item.slug === slug ? 'active' : ''} to={categoryPath(item.slug)} key={item.slug}>{item.name}</Link>)}</nav><div className="product-grid catalog-grid">{categoryProducts.map((product) => <ProductCard product={product} key={product.slug} />)}</div><section className="catalog-cta"><p className="eyebrow">¿Buscás algo especial?</p><h2>Consultanos por piezas personalizadas.</h2><a className="button" href={whatsappUrl('una pieza personalizada')} target="_blank" rel="noreferrer">Hablar por WhatsApp <span>↗</span></a></section></main>
+  return <main className="catalog-page"><section className="catalog-heading"><p className="eyebrow">Due Sorelas / {category.name}</p><h1>{category.name}</h1><p>{category.intro}</p></section><nav className="category-pills" aria-label="Filtrar por categoría">{catalogCategories.map((item) => <Link className={item.slug === slug ? 'active' : ''} to={categoryPath(item.slug)} key={item.slug}>{item.name}</Link>)}</nav><div className="product-grid catalog-grid">{categoryProducts.map((product) => <ProductCard product={product} key={product.slug} />)}</div><section className="catalog-cta"><p className="eyebrow">¿Buscás algo especial?</p><h2>Consultanos por piezas personalizadas.</h2><a className="button" href={whatsappUrl('una pieza personalizada')} target="_blank" rel="noreferrer">Hablar por WhatsApp <span>↗</span></a></section></main>
 }
 
 function ProductPage() {

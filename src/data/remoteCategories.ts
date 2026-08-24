@@ -15,8 +15,15 @@ export function useRemoteCategories() {
   }, [])
   if (!remote) return fallbackCategories
   const aliases: Record<string, string> = { collares: 'collar', dijes: 'dije', colgantes: 'colgante', pulseras: 'pulsera', accesorios: 'accesorio' }
-  return fallbackCategories.map((category: Category) => {
-    const current = remote.find((item) => item.slug === category.slug || item.slug === aliases[category.slug])
-    return current?.image_url ? { ...category, image: current.image_url } : category
+  const normalized: Category[] = remote.map((item) => {
+    const fallback = fallbackCategories.find((category) => category.slug === item.slug || aliases[category.slug] === item.slug)
+    return {
+      slug: fallback?.slug || item.slug,
+      name: item.name || fallback?.name || item.slug,
+      intro: fallback?.intro || 'Piezas pensadas para acompañar tus días.',
+      image: item.image_url || fallback?.image || '/assets/catalogo-due-sorelas.png',
+      position: fallback?.position,
+    } as Category
   })
+  return normalized.concat(fallbackCategories.filter((category) => !remote.some((item) => item.slug === category.slug || aliases[category.slug] === item.slug)))
 }
