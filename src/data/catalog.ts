@@ -13,6 +13,7 @@ export type Product = {
   shortDescription: string
   description: string
   price: number
+  priceNote?: string
   material: string
   dimensions: string
   image: string
