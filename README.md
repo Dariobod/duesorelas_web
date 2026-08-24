@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-## Rutas incluidas
+## Rutas incluidas....1
 
 - `/` — portada y categorías.
 - `/categorias/:slug` — listado por rubro.
