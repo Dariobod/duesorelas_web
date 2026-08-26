@@ -96,7 +96,6 @@ function ProductCard({ product }: { product: Product }) {
       <a className="product-whatsapp" href={whatsappUrl(product.name)} target="_blank" rel="noreferrer">Consultanos por WhatsApp</a>
     </div>
     <div className="product-info"><div><h3><Link to={'/productos/' + product.slug}>{product.name}</Link></h3><p>{product.shortDescription}</p></div><strong>{money.format(product.price)}</strong></div>
-    <a className="text-link" href={whatsappUrl(product.name)} target="_blank" rel="noreferrer">Consultar por WhatsApp <span>{String.fromCharCode(8599)}</span></a>
   </article>
 }
 
