@@ -35,3 +35,12 @@ npm run dev
 <!-- Flujo verificado: commit local y despliegue remoto -->
 
 <!-- Verificación del flujo GitHub → Cloudflare Workers -->
+
+## Upload de imagenes a Cloudinary
+
+El backoffice permite seleccionar imagenes desde la computadora. El Worker genera una firma segura y Cloudinary devuelve la secure_url, que luego queda guardada en D1 al guardar el producto o la categoria.
+
+En Cloudflare Production configurar:
+- CLOUDINARY_CLOUD_NAME como variable de entorno.
+- CLOUDINARY_API_KEY como Runtime Secret.
+- CLOUDINARY_API_SECRET como Runtime Secret.

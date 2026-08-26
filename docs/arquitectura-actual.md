@@ -61,6 +61,9 @@ Migraciones relevantes: `migrations/0001_initial.sql` a `0005_cloudinary_urls.sq
 
 Los secretos `ADMIN_PASSWORD` y `SESSION_SECRET` deben existir como **Runtime Secret** en Production. Nunca deben entrar al repositorio.
 
-## Límites actuales
+## Upload de imagenes a Cloudinary
 
-El backoffice ya permite listar, crear y editar productos, pero todavía usa URLs de Cloudinary pegadas manualmente. Falta integrar el selector de archivos con un upload firmado o un flujo controlado. Tampoco hay búsqueda, paginación, borrado, roles múltiples ni auditoría de cambios.
+El backoffice genera una firma temporal en el Worker y sube las imagenes directamente a Cloudinary dentro de la carpeta due-sorelas/products. La secure_url recibida se guarda en D1 al guardar el producto o la categoria.
+
+Variables requeridas en Production: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET.
+## Límites actuales

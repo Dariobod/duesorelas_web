@@ -3,6 +3,9 @@ export interface Env {
   ASSETS: Fetcher;
   ADMIN_PASSWORD: string;
   SESSION_SECRET: string;
+  CLOUDINARY_CLOUD_NAME?: string;
+  CLOUDINARY_API_KEY?: string;
+  CLOUDINARY_API_SECRET?: string;
 }
 
 const json = (data: unknown, init: ResponseInit = {}) =>
@@ -35,6 +38,7 @@ async function readJson<T>(request: Request, maxBytes = 64 * 1024): Promise<T> {
 
 function validText(value: unknown, max: number) { return typeof value === 'string' && value.length <= max }
 function sameOrigin(request: Request) { const origin = request.headers.get('origin'); return !origin || origin === new URL(request.url).origin }
+async function sha1Hex(value: string) { const bytes = new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(value))); return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('') }
 function isVideoUrl(url: string) { return /(?:\/video\/|\.(?:mp4|webm|ogg)(?:[?#]|$))/i.test(url) }
 function resolveHeroMediaType(url: string, value: string) { return value === 'video' || isVideoUrl(url) ? 'video' : 'image' }
 function heroMediaTypeForSave(url: string, value: string) { return resolveHeroMediaType(url, value) }
@@ -86,6 +90,14 @@ export default {
       return json({ ok: true }, { headers: { 'cache-control': 'no-store', 'set-cookie': '__Host-ds_admin=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0' } });
     }
 
+    if (url.pathname === '/api/admin/cloudinary-signature' && request.method === 'GET') {
+      if (!(await isAdmin(request, env))) return json({ error: 'No autorizado' }, { status: 401 });
+      if (!env.CLOUDINARY_CLOUD_NAME || !env.CLOUDINARY_API_KEY || !env.CLOUDINARY_API_SECRET) return json({ error: 'Cloudinary no est� configurado en el servidor' }, { status: 500 });
+      const timestamp = Math.floor(Date.now() / 1000);
+      const folder = 'due-sorelas/products';
+      const signature = await sha1Hex('folder=' + folder + '&timestamp=' + timestamp + env.CLOUDINARY_API_SECRET);
+      return json({ cloud_name: env.CLOUDINARY_CLOUD_NAME, api_key: env.CLOUDINARY_API_KEY, timestamp, folder, signature }, { headers: { 'cache-control': 'no-store, private' } });
+    }
     if (url.pathname === '/api/admin/content' && (await isAdmin(request, env))) {
       if (request.method === 'GET') {
         try {
