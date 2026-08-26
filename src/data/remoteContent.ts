@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 
-export type HomeContent = { heroImage: string; craftVideo: string }
+export type HeroMediaType = 'image' | 'video'
+export type HomeContent = { heroMediaUrl: string; heroMediaType: HeroMediaType; craftVideo: string }
 
 export const defaultHomeContent: HomeContent = {
-  heroImage: '/assets/hero-due-sorelas.png',
+  heroMediaUrl: '/assets/hero-due-sorelas.png',
+  heroMediaType: 'image',
   craftVideo: 'https://videos.pexels.com/video-files/6263745/6263745-sd_360_640_25fps.mp4',
 }
 
@@ -13,7 +15,15 @@ export function useRemoteContent() {
   useEffect(() => {
     fetch('/api/content')
       .then((response) => response.ok ? response.json() : null)
-      .then((value: HomeContent | null) => value && setContent({ ...defaultHomeContent, ...value }))
+      .then((value: Partial<HomeContent & { heroImage?: string }> | null) => {
+        if (!value) return
+        setContent({
+          ...defaultHomeContent,
+          ...value,
+          heroMediaUrl: value.heroMediaUrl || value.heroImage || defaultHomeContent.heroMediaUrl,
+          heroMediaType: value.heroMediaType === 'video' ? 'video' : 'image',
+        })
+      })
       .catch(() => undefined)
   }, [])
 
