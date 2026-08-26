@@ -4,7 +4,7 @@ import Lenis from 'lenis'
 import { categories, money, products, whatsappUrl, type Product } from './data/catalog'
 import { useRemoteProducts } from './data/remoteCatalog'
 import { useRemoteCategories } from './data/remoteCategories'
-import { useRemoteContent } from './data/remoteContent'
+import { isVideoUrl, useRemoteContent } from './data/remoteContent'
 import Admin from './Admin'
 
 const categoryPath = (slug: string) => `/categorias/${slug}`
@@ -115,7 +115,7 @@ function Home() {
     return () => observer.disconnect()
   }, [])
   return <main>
-    <section className="hero">{homeContent.heroMediaType === 'video' ? <video src={homeContent.heroMediaUrl} autoPlay muted loop playsInline aria-label="Video de fondo de Due Sorelas" /> : <img src={homeContent.heroMediaUrl} alt="Mujer usando bijouterie artesanal Due Sorelas" />}<div className="hero-copy"><p className="eyebrow">Bijouterie creada a mano</p><h1>Objetos pequeños,<br /><em>gestos que quedan.</em></h1><Link className="button button-light" to={categoryPath('collares')}>Explorar piezas <span>↗</span></Link></div><p className="hero-note">Hecho con intención<br />en Buenos Aires</p></section>
+    <section className="hero">{(homeContent.heroMediaType === 'video' || isVideoUrl(homeContent.heroMediaUrl)) ? <video src={homeContent.heroMediaUrl} autoPlay muted loop playsInline aria-label="Video de fondo de Due Sorelas" /> : <img src={homeContent.heroMediaUrl} alt="Mujer usando bijouterie artesanal Due Sorelas" />}<div className="hero-copy"><p className="eyebrow">Bijouterie creada a mano</p><h1>Objetos pequeños,<br /><em>gestos que quedan.</em></h1><Link className="button button-light" to={categoryPath('collares')}>Explorar piezas <span>↗</span></Link></div><p className="hero-note">Hecho con intención<br />en Buenos Aires</p></section>
     <section className="intro section"><p className="eyebrow">Nuestra forma</p><h2 ref={introTitleRef} className="intro-reveal">Diseñamos piezas que se sienten propias desde el primer día.</h2><p>Collares, pulseras, dijes y pequeños adornos para combinar, regalar y llevar cerca.</p></section>
     <section className="about section" id="quienes-somos">
       <div className="about-heading"><p className="eyebrow">Quiénes somos</p><span>02 — Historia</span></div>

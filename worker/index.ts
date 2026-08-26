@@ -35,6 +35,9 @@ async function readJson<T>(request: Request, maxBytes = 64 * 1024): Promise<T> {
 
 function validText(value: unknown, max: number) { return typeof value === 'string' && value.length <= max }
 function sameOrigin(request: Request) { const origin = request.headers.get('origin'); return !origin || origin === new URL(request.url).origin }
+function isVideoUrl(url: string) { return /(?:\/video\/|\.(?:mp4|webm|ogg)(?:[?#]|$))/i.test(url) }
+function resolveHeroMediaType(url: string, value: string) { return value === 'video' || isVideoUrl(url) ? 'video' : 'image' }
+function heroMediaTypeForSave(url: string, value: string) { return resolveHeroMediaType(url, value) }
 const defaultContent = { hero_media_url: '/assets/hero-due-sorelas.png', hero_media_type: 'image', hero_image: '/assets/hero-due-sorelas.png', craft_video: 'https://videos.pexels.com/video-files/6263745/6263745-sd_360_640_25fps.mp4' }
 const categoryIntroDefaults: Record<string, string> = {
   collar: 'Capas, amuletos y detalles que acompañan todos los días.', collares: 'Capas, amuletos y detalles que acompañan todos los días.',
@@ -88,7 +91,7 @@ export default {
         try {
           const result = await env.DB.prepare('SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN (?, ?, ?, ?)').bind('home_hero_media_url', 'home_hero_media_type', 'home_hero_image', 'home_craft_video').all();
           const values = Object.fromEntries(result.results.map((setting) => [String(setting.setting_key), String(setting.setting_value || '')]));
-          const heroMediaUrl = values.home_hero_media_url || values.home_hero_image || defaultContent.hero_media_url; const heroMediaType = values.home_hero_media_type === 'video' ? 'video' : 'image'; return json({ hero_media_url: heroMediaUrl, hero_media_type: heroMediaType, craft_video: values.home_craft_video || defaultContent.craft_video }, { headers: { 'cache-control': 'no-store, private' } });
+          const heroMediaUrl = values.home_hero_media_url || values.home_hero_image || defaultContent.hero_media_url; const heroMediaType = resolveHeroMediaType(heroMediaUrl, values.home_hero_media_type || 'image'); return json({ hero_media_url: heroMediaUrl, hero_media_type: heroMediaType, craft_video: values.home_craft_video || defaultContent.craft_video }, { headers: { 'cache-control': 'no-store, private' } });
         } catch {
           return json(defaultContent, { headers: { 'cache-control': 'no-store, private' } });
         }
@@ -98,7 +101,7 @@ export default {
         let body: { hero_media_url?: string; hero_media_type?: string; craft_video?: string };
         try { body = await readJson(request, 16 * 1024); } catch { return json({ error: 'Solicitud inv\u00e1lida' }, { status: 400 }); }
         const heroMediaUrl = String(body.hero_media_url || '').trim();
-        const heroMediaType = String(body.hero_media_type || 'image');
+        const heroMediaType = heroMediaTypeForSave(heroMediaUrl, String(body.hero_media_type || 'image'));
         const craftVideo = String(body.craft_video || '').trim();
         if (!validText(heroMediaUrl, 2000) || !validText(craftVideo, 2000) || !['image', 'video'].includes(heroMediaType) || (heroMediaUrl && heroMediaUrl !== defaultContent.hero_media_url && !heroMediaUrl.startsWith('https://')) || (craftVideo && !craftVideo.startsWith('https://'))) return json({ error: 'Las URLs deben ser HTTPS y tener un m\u00e1ximo de 2000 caracteres' }, { status: 400 });
         try {
@@ -223,7 +226,7 @@ export default {
       try {
         const result = await env.DB.prepare('SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN (?, ?, ?, ?)').bind('home_hero_media_url', 'home_hero_media_type', 'home_hero_image', 'home_craft_video').all();
         const values = Object.fromEntries(result.results.map((setting) => [String(setting.setting_key), String(setting.setting_value || '')]));
-        const heroMediaUrl = values.home_hero_media_url || values.home_hero_image || defaultContent.hero_media_url; const heroMediaType = values.home_hero_media_type === 'video' ? 'video' : 'image'; return json({ heroMediaUrl, heroMediaType, heroImage: heroMediaUrl, craftVideo: values.home_craft_video || defaultContent.craft_video }, { headers: { 'cache-control': 'public, max-age=60, s-maxage=300' } });
+        const heroMediaUrl = values.home_hero_media_url || values.home_hero_image || defaultContent.hero_media_url; const heroMediaType = resolveHeroMediaType(heroMediaUrl, values.home_hero_media_type || 'image'); return json({ heroMediaUrl, heroMediaType, heroImage: heroMediaUrl, craftVideo: values.home_craft_video || defaultContent.craft_video }, { headers: { 'cache-control': 'public, max-age=60, s-maxage=300' } });
       } catch {
         return json({ heroMediaUrl: defaultContent.hero_media_url, heroMediaType: defaultContent.hero_media_type, heroImage: defaultContent.hero_image, craftVideo: defaultContent.craft_video }, { headers: { 'cache-control': 'public, max-age=60, s-maxage=300' } });
       }
