@@ -73,9 +73,9 @@ function Header() {
     return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('pointermove', onPointerMove) }
   }, [])
   return <header className={`site-header${hidden ? ' is-hidden' : ''}`}>
-    <button className="menu-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="main-nav"><span /><span /></button>
+    <button className="menu-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="main-nav"><span /><span /><span /></button>
     <Link className="brand" to="/" aria-label="Due Sorelas, inicio">DUE <em>Sorelas</em></Link>
-    <a className="header-contact" href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">Consultar <span>↗</span></a>
+    <div className="header-actions"><a className="header-explore" href="/#explorar">Explorar</a><a className="header-contact" href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">Consultar <span>↗</span></a></div>
     <nav id="main-nav" className={open ? 'main-nav is-open' : 'main-nav'} aria-label="Categorías">
       <Link to="/">Inicio</Link>
       {menuCategories.map((category) => <NavLink key={category.slug} to={categoryPath(category.slug)}>{category.name}</NavLink>)}
@@ -130,7 +130,7 @@ function Home() {
         </div>
       </div>
     </section>
-    <section className="categories section"><div className="section-heading"><p className="eyebrow">Explorá por rubro</p><span>01 — 05</span></div><div className="category-grid">{homeCategories.map((category, index) => <Link className={`category-card category-${index + 1}`} key={category.slug} to={categoryPath(category.slug)}><img src={category.image} alt="" style={{ objectPosition: category.position }} loading="lazy" /><div><span>0{index + 1}</span><h3>{category.name}</h3><p>{category.intro}</p><b>Descubrir <i>↗</i></b></div></Link>)}</div></section>
+    <section className="categories section" id="explorar"><div className="section-heading"><p className="eyebrow">Explorá por rubro</p><span>01 — 05</span></div><div className="category-grid">{homeCategories.map((category, index) => <Link className={`category-card category-${index + 1}`} key={category.slug} to={categoryPath(category.slug)}><img src={category.image} alt="" style={{ objectPosition: category.position }} loading="lazy" /><div><span>0{index + 1}</span><h3>{category.name}</h3><p>{category.intro}</p><b>Descubrir <i>↗</i></b></div></Link>)}</div></section>
     <section className="craft-feature section"><div className="craft-copy"><p className="eyebrow">El detalle importa</p><h2>Hecho lento.<br /><em>Para usar mucho.</em></h2><p>Cada composición nace de combinar texturas, color y pequeños símbolos. La imperfección también es parte de la pieza.</p><a className="text-link" href={whatsappUrl('una pieza personalizada')} target="_blank" rel="noreferrer">Hacer una consulta <span>↗</span></a></div><div className="craft-video"><video autoPlay muted loop playsInline poster="/assets/catalogo-due-sorelas.png"><source src={homeContent.craftVideo} type="video/mp4" /></video></div></section>
     <section className="featured section"><div className="section-heading"><p className="eyebrow">Selección</p><Link className="text-link" to={categoryPath('collares')}>Ver todo <span>↗</span></Link></div><div className="product-grid">{featured.map((product) => <ProductCard product={product} key={product.slug} />)}</div></section>
   </main>
