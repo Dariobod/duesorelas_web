@@ -60,3 +60,13 @@
 .product-details .price-note { margin: 0 0 31px; color: var(--muted); font-family: var(--mono); font-size: 10px; line-height: 1.45; text-transform: uppercase; }
 
 .content-form { max-width: 980px; } .admin-content-preview { width: 100%; max-width: 320px; height: 180px; margin-top: 8px; border: 1px solid var(--line); background: #e8e0d8; object-fit: cover; } .admin-hero-preview { aspect-ratio: 16 / 9; height: auto; } .admin-form-hint { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+/* Product card hover gallery and WhatsApp action */
+.product-image { position: relative; }
+.product-image-link { position: absolute; inset: 0; display: block; }
+.product-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .35s ease, transform .5s ease; }
+.product-image-secondary { opacity: 0; }
+.product-card:hover .product-image-secondary, .product-card:focus-within .product-image-secondary { opacity: 1; }
+.product-card:hover .product-image img, .product-card:focus-within .product-image img { transform: scale(1.025); }
+.product-whatsapp { position: absolute; right: 0; bottom: 0; left: 0; z-index: 1; display: block; padding: 15px 12px; background: #000; color: #fff; font-family: var(--mono); font-size: 10px; text-align: center; text-transform: uppercase; opacity: 0; transform: translateY(100%); transition: opacity .2s ease, transform .2s ease; }
+.product-card:hover .product-whatsapp, .product-card:focus-within .product-whatsapp { opacity: 1; transform: none; }

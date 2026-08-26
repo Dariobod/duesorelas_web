@@ -85,10 +85,18 @@ function Header() {
 }
 
 function ProductCard({ product }: { product: Product }) {
+  const secondaryImage = product.gallery[1]
+
   return <article className="product-card">
-    <Link to={`/productos/${product.slug}`} className="product-image"><img src={product.image} alt={product.name} style={{ objectPosition: product.position }} loading="lazy" /><span>Ver pieza</span></Link>
-    <div className="product-info"><div><h3><Link to={`/productos/${product.slug}`}>{product.name}</Link></h3><p>{product.shortDescription}</p></div><strong>{money.format(product.price)}</strong></div>
-    <a className="text-link" href={whatsappUrl(product.name)} target="_blank" rel="noreferrer">Consultar por WhatsApp <span>↗</span></a>
+    <div className="product-image">
+      <Link to={'/productos/' + product.slug} className="product-image-link" aria-label={'Ver ' + product.name}>
+        <img className="product-image-primary" src={product.image} alt={product.name} style={{ objectPosition: product.position }} loading="lazy" />
+        {secondaryImage && <img className="product-image-secondary" src={secondaryImage} alt="" style={{ objectPosition: product.position }} loading="lazy" aria-hidden="true" />}
+      </Link>
+      <a className="product-whatsapp" href={whatsappUrl(product.name)} target="_blank" rel="noreferrer">Consultanos por WhatsApp</a>
+    </div>
+    <div className="product-info"><div><h3><Link to={'/productos/' + product.slug}>{product.name}</Link></h3><p>{product.shortDescription}</p></div><strong>{money.format(product.price)}</strong></div>
+    <a className="text-link" href={whatsappUrl(product.name)} target="_blank" rel="noreferrer">Consultar por WhatsApp <span>{String.fromCharCode(8599)}</span></a>
   </article>
 }
 
