@@ -91,16 +91,16 @@ export default {
         try {
           const result = await env.DB.prepare('SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN (?, ?, ?, ?)').bind('home_hero_media_url', 'home_hero_media_type', 'home_hero_image', 'home_craft_video').all();
           const values = Object.fromEntries(result.results.map((setting) => [String(setting.setting_key), String(setting.setting_value || '')]));
-          const heroMediaUrl = values.home_hero_media_url || values.home_hero_image || defaultContent.hero_media_url; const heroMediaType = resolveHeroMediaType(heroMediaUrl, values.home_hero_media_type || 'image'); return json({ hero_media_url: heroMediaUrl, hero_media_type: heroMediaType, craft_video: values.home_craft_video || defaultContent.craft_video }, { headers: { 'cache-control': 'no-store, private' } });
+          const heroMediaUrl = values.home_hero_media_url || values.home_hero_image || defaultContent.hero_media_url; const heroMediaType = resolveHeroMediaType(heroMediaUrl, values.home_hero_media_type || 'image'); return json({ hero_media_url: heroMediaUrl, hero_media_type: heroMediaType, hero_image: heroMediaUrl, craft_video: values.home_craft_video || defaultContent.craft_video }, { headers: { 'cache-control': 'no-store, private' } });
         } catch {
           return json(defaultContent, { headers: { 'cache-control': 'no-store, private' } });
         }
       }
       if (request.method === 'PUT') {
         if (!sameOrigin(request)) return json({ error: 'Origen no permitido' }, { status: 403 });
-        let body: { hero_media_url?: string; hero_media_type?: string; craft_video?: string };
+        let body: { hero_media_url?: string; hero_image?: string; hero_media_type?: string; craft_video?: string };
         try { body = await readJson(request, 16 * 1024); } catch { return json({ error: 'Solicitud inv\u00e1lida' }, { status: 400 }); }
-        const heroMediaUrl = String(body.hero_media_url || '').trim();
+        const heroMediaUrl = String(body.hero_media_url || body.hero_image || '').trim();
         const heroMediaType = heroMediaTypeForSave(heroMediaUrl, String(body.hero_media_type || 'image'));
         const craftVideo = String(body.craft_video || '').trim();
         if (!validText(heroMediaUrl, 2000) || !validText(craftVideo, 2000) || !['image', 'video'].includes(heroMediaType) || (heroMediaUrl && heroMediaUrl !== defaultContent.hero_media_url && !heroMediaUrl.startsWith('https://')) || (craftVideo && !craftVideo.startsWith('https://'))) return json({ error: 'Las URLs deben ser HTTPS y tener un m\u00e1ximo de 2000 caracteres' }, { status: 400 });
@@ -112,7 +112,7 @@ export default {
             env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value, updated_at=excluded.updated_at").bind('home_hero_image', heroMediaType === 'image' ? (heroMediaUrl || defaultContent.hero_image) : defaultContent.hero_image),
             env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value, updated_at=excluded.updated_at").bind('home_craft_video', craftVideo || defaultContent.craft_video),
           ]);
-          return json({ hero_media_url: heroMediaUrl || defaultContent.hero_media_url, hero_media_type: heroMediaType, craft_video: craftVideo || defaultContent.craft_video }, { headers: { 'cache-control': 'no-store, private' } });
+          return json({ hero_media_url: heroMediaUrl || defaultContent.hero_media_url, hero_media_type: heroMediaType, hero_image: heroMediaType === 'image' ? (heroMediaUrl || defaultContent.hero_image) : defaultContent.hero_image, craft_video: craftVideo || defaultContent.craft_video }, { headers: { 'cache-control': 'no-store, private' } });
         } catch (error) {
           console.error('admin content save failed', error);
           return json({ error: 'No se pudo guardar el contenido' }, { status: 500 });
