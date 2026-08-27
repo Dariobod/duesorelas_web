@@ -74,7 +74,7 @@ function Header() {
   }, [])
   return <header className={`site-header${hidden ? ' is-hidden' : ''}`}>
     <button className="menu-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="main-nav"><span /><span /><span /></button>
-    <Link className="brand" to="/" aria-label="Due Sorelas, inicio">DUE <em>Sorelas</em></Link>
+    <Link className="brand" to="/" aria-label="Due Sorelas, inicio"><img className="brand-logo" src="/LOGO_DS_02.png" alt="" aria-hidden="true" /> <span>DUE <em>Sorelas</em></span></Link>
     <div className="header-actions"><a className="header-explore" href="/#explorar">Explorar</a><a className="header-contact" href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">Consultar <span>↗</span></a></div>
     <nav id="main-nav" className={open ? 'main-nav is-open' : 'main-nav'} aria-label="Categorías">
       <Link to="/">Inicio</Link>
