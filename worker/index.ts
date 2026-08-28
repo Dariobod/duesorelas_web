@@ -8,6 +8,8 @@ export interface Env {
   CLOUDINARY_API_SECRET?: string;
 }
 
+const ADMIN_SESSION_MAX_AGE = 60 * 60 * 24 * 30;
+
 const json = (data: unknown, init: ResponseInit = {}) =>
   new Response(JSON.stringify(data), {
     ...init,
@@ -76,10 +78,10 @@ export default {
       let body: { password?: string };
       try { body = await readJson(request, 16 * 1024); } catch { return json({ error: 'Solicitud inválida' }, { status: 400 }); }
       if (!body.password || body.password !== env.ADMIN_PASSWORD) return json({ error: 'Credenciales inválidas' }, { status: 401 });
-      const payload = encode(JSON.stringify({ expiresAt: Date.now() + 1000 * 60 * 60 * 8 }));
+      const payload = encode(JSON.stringify({ expiresAt: Date.now() + ADMIN_SESSION_MAX_AGE * 1000 }));
       try {
         const signature = await sign(payload, env.SESSION_SECRET);
-        return json({ ok: true }, { headers: { 'cache-control': 'no-store', 'set-cookie': `__Host-ds_admin=${payload}.${signature}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800` } });
+        return json({ ok: true }, { headers: { 'cache-control': 'no-store', 'set-cookie': `__Host-ds_admin=${payload}.${signature}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${ADMIN_SESSION_MAX_AGE}` } });
       } catch (error) {
         console.error('admin login signing failed', error);
         return json({ error: 'No se pudo iniciar sesión' }, { status: 500, headers: { 'cache-control': 'no-store, private' } });
