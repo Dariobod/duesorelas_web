@@ -25,5 +25,5 @@ export function useRemoteCategories() {
       position: fallback?.position,
     } as Category
   })
-  return normalized.concat(fallbackCategories.filter((category) => !remote.some((item) => item.slug === category.slug || aliases[category.slug] === item.slug)))
+  return normalized
 }
