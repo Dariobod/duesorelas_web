@@ -33,7 +33,7 @@ export default function Admin() {
   async function load() {
     const [productsResponse, categoriesResponse, contentResponse] = await Promise.all([fetch('/api/admin/products'), fetch('/api/admin/categories'), fetch('/api/admin/content')])
     if (!productsResponse.ok || !categoriesResponse.ok || !contentResponse.ok) { setLoggedIn(false); return }
-    setProducts(await productsResponse.json()); setCategories(await categoriesResponse.json()); setContent(await contentResponse.json())
+    setProducts(await productsResponse.json()); setCategories(await categoriesResponse.json()); setContent(await contentResponse.json()); setLoggedIn(true)
   }
   useEffect(() => { load() }, [])
   const sortedProducts = useMemo(() => [...products].sort((a, b) => { const left = a[sort.key], right = b[sort.key]; const result = typeof left === 'number' && typeof right === 'number' ? left - right : String(left).localeCompare(String(right), 'es'); return sort.direction === 'asc' ? result : -result }), [products, sort])
