@@ -60,6 +60,20 @@
 .product-details .price-note { margin: 0 0 31px; color: var(--muted); font-family: var(--mono); font-size: 10px; line-height: 1.45; text-transform: uppercase; }
 
 .content-form { max-width: 980px; } .admin-content-preview { width: 100%; max-width: 320px; height: 180px; margin-top: 8px; border: 1px solid var(--line); background: #e8e0d8; object-fit: cover; } .admin-hero-preview { aspect-ratio: 16 / 9; height: auto; } .admin-form-hint { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+/* Backoffice typography */
+.admin-page .catalog-heading > p:last-child { font-size: 17px; }
+.admin-page .admin-login label { font-size: 13px; }
+.admin-page .admin-login p, .admin-page .admin-error { font-size: 15px; }
+.admin-page .admin-toolbar .button, .admin-page .admin-form .button { font-size: 12px; }
+.admin-page .admin-tabs button { font-size: 12px; }
+.admin-page .admin-row { font-size: 15px; }
+.admin-page .admin-head { font-size: 12px; }
+.admin-page .admin-category-placeholder { font-size: 12px; }
+.admin-page .admin-category-card h3 { font-size: 18px; }
+.admin-page .admin-category-card p { font-size: 12px; }
+.admin-page .admin-form label { font-size: 12px; }
+.admin-page .admin-form-hint { font-size: 14px; }
+.admin-page .text-link { font-size: 12px; }
 
 /* Product card hover gallery and WhatsApp action */
 .product-image { position: relative; }
