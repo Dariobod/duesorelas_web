@@ -55,24 +55,10 @@ function ScrollToTop() {
 
 function Header() {
   const [open, setOpen] = useState(false)
-  const [hidden, setHidden] = useState(false)
   const location = useLocation()
   const menuCategories = useRemoteCategories()
   useEffect(() => setOpen(false), [location.pathname])
-  useEffect(() => {
-    let lastScroll = window.scrollY
-    const onScroll = () => {
-      const current = window.scrollY
-      if (current <= 24 || current < lastScroll - 4) setHidden(false)
-      else if (current > lastScroll + 4 && current > 90) { setHidden(true); setOpen(false) }
-      lastScroll = current
-    }
-    const onPointerMove = (event: PointerEvent) => { if (event.clientY <= 90) setHidden(false) }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('pointermove', onPointerMove, { passive: true })
-    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('pointermove', onPointerMove) }
-  }, [])
-  return <header className={`site-header${hidden ? ' is-hidden' : ''}`}>
+  return <header className="site-header">
     <button className="menu-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="main-nav"><span /><span /><span /></button>
     <Link className="brand" to="/" aria-label="Due Sorelas, inicio"><img className="brand-logo" src="/LOGO_DS_02.png" alt="" aria-hidden="true" /> <span>DUE <em>Sorelas</em></span></Link>
     <div className="header-actions"><a className="header-explore" href="/#explorar">Explorar</a><a className="header-contact" href={whatsappUrl('una pieza')} target="_blank" rel="noreferrer">Consultar <span>↗</span></a></div>
