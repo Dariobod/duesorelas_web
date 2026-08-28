@@ -8,6 +8,7 @@ import { isVideoUrl, useRemoteContent } from './data/remoteContent'
 import Admin from './Admin'
 
 const categoryPath = (slug: string) => `/categorias/${slug}`
+let activeLenis: Lenis | null = null
 
 function SmoothScroll() {
   useEffect(() => {
@@ -22,6 +23,7 @@ function SmoothScroll() {
       anchors: true,
       stopInertiaOnNavigate: true,
     })
+    activeLenis = lenis
     let frameId = 0
     const animate = (time: number) => {
       lenis.raf(time)
@@ -32,6 +34,7 @@ function SmoothScroll() {
     return () => {
       cancelAnimationFrame(frameId)
       lenis.destroy()
+      if (activeLenis === lenis) activeLenis = null
     }
   }, [])
 
@@ -43,6 +46,7 @@ function ScrollToTop() {
 
   useEffect(() => {
     const reset = () => {
+      activeLenis?.scrollTo(0, { immediate: true, force: true })
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
       document.documentElement.scrollTop = 0
       document.body.scrollTop = 0
