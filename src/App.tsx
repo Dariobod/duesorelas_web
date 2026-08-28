@@ -13,6 +13,22 @@ function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
+    let scrolling = false
+    let stopTimer = 0
+    const onScroll = () => {
+      scrolling = true
+      window.clearTimeout(stopTimer)
+      stopTimer = window.setTimeout(() => { scrolling = false }, 140)
+    }
+    const preventClickWhileScrolling = (event: MouseEvent) => {
+      if (scrolling && (event.target as HTMLElement | null)?.closest('a')) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    document.addEventListener('click', preventClickWhileScrolling, true)
+
     const lenis = new Lenis({
       duration: 1.65,
       easing: (time) => 1 - Math.pow(2, -7 * time),
@@ -30,6 +46,9 @@ function SmoothScroll() {
     return () => {
       cancelAnimationFrame(frameId)
       lenis.destroy()
+      window.clearTimeout(stopTimer)
+      window.removeEventListener('scroll', onScroll)
+      document.removeEventListener('click', preventClickWhileScrolling, true)
     }
   }, [])
 
