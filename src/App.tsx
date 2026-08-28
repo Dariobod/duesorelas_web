@@ -19,6 +19,8 @@ function SmoothScroll() {
       smoothWheel: true,
       syncTouch: false,
       wheelMultiplier: 0.85,
+      anchors: true,
+      stopInertiaOnNavigate: true,
     })
     let frameId = 0
     const animate = (time: number) => {
