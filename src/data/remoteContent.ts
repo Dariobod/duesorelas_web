@@ -6,7 +6,7 @@ export type HomeContent = { heroMediaUrl: string; heroMediaType: HeroMediaType; 
 export const isVideoUrl = (url: string) => /(?:\/video\/|\.(?:mp4|webm|ogg)(?:[?#]|$))/i.test(url)
 
 export const defaultHomeContent: HomeContent = {
-  heroMediaUrl: '/assets/hero-due-sorelas.png',
+  heroMediaUrl: '/assets/hero-due-sorelas_2.webp',
   heroMediaType: 'image',
   craftVideo: 'https://videos.pexels.com/video-files/6263745/6263745-sd_360_640_25fps.mp4',
 }
